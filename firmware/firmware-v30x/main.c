@@ -114,11 +114,9 @@
 // define this to print out cmd+args in handleMessage()
 #define DEBUG_HANDLEMESSAGE 0
 
-#define BOARD_TYPE BOARD_TYPE_BLINK1MK3       // ws2812 data out on B7
-//#define BOARD_TYPE BOARD_TYPE_TOMU          // ws2812 data out on E13
-//#define BOARD_TYPE BOARD_TYPE_EFM32HGDEVKIT // ws2812 data out on E10
+#define BOARD_TYPE BOARD_TYPE_TOMU          // ws2812 data out on E13
 
-#define nLEDs 18   // number of LEDS
+#define nLEDs 8   // number of LEDS
 
 #include "utils.h"
 #include "leuart.h"
@@ -150,8 +148,7 @@ extern struct toboot_runtime toboot_runtime;
  * TOBOOT_CONFIG_FLAG_AUTORUN to this macro.  Otherwise, leave the
  * configuration value at 0 to use the defaults.
  */
-TOBOOT_CONFIGURATION(0);
-//TOBOOT_CONFIGURATION( TOBOOT_CONFIG_FLAG_AUTORUN );
+TOBOOT_CONFIGURATION( TOBOOT_CONFIG_FLAG_AUTORUN );
 //
 // Note: Must also set "toboot_runtime.boot_count = 0"
 // to prevent bootloader from running after 3 power-cycles
@@ -240,10 +237,10 @@ __attribute__ ((section(".userFlashSection")))
 const userdata_t userFlash = {
   .startup_params =
   {
-    .bootmode = BOOT_NORMAL,
+    .bootmode = BOOT_PLAY,
     .playstart = 0,
     .playend = PATT_MAX,  // one more than
-    .playcount = 0,
+    .playcount = 1,
     .bootloaderlock = 0,
     .serverdown_playstart = 0,
     .serverdown_playend = 0,
@@ -252,22 +249,7 @@ const userdata_t userFlash = {
   .pattern =
   {
     //    R     G     B    fade ledn
-    { { 0xff, 0x00, 0x00 },  50, 1 }, // 0  red A
-    { { 0xff, 0x00, 0x00 },  50, 2 }, // 1  red B
-    { { 0x00, 0x00, 0x00 },  50, 0 }, // 2  off both
-    { { 0x00, 0xff, 0x00 },  50, 1 }, // 3  grn A
-    { { 0x00, 0xff, 0x00 },  50, 2 }, // 4  grn B
-    { { 0x00, 0x00, 0x00 },  50, 0 }, // 5  off both
-    { { 0x00, 0x00, 0xff },  50, 1 }, // 6  blu A
-    { { 0x00, 0x00, 0xff },  50, 2 }, // 7  blu B
-    { { 0x00, 0x00, 0x00 },  50, 0 }, // 8  off both
-    { { 0x80, 0x80, 0x80 }, 100, 0 }, // 9  half-bright, both LEDs
-    { { 0x00, 0x00, 0x00 }, 100, 0 }, // 10 off both
-    { { 0xff, 0xff, 0xff },  50, 1 }, // 11 white A
-    { { 0x00, 0x00, 0x00 },  50, 1 }, // 12 off A
-    { { 0xff, 0xff, 0xff },  50, 2 }, // 13 white B
-    { { 0x00, 0x00, 0x00 }, 100, 2 }, // 14 off B
-    { { 0x00, 0x00, 0x00 }, 100, 0 }, // 15 off everyone
+    { { 0xff, 0xff, 0xff }, 100, 0 }, // 9  half-bright, both LEDs
   },
 };
 
@@ -919,12 +901,13 @@ int main()
   hidDescriptor = (void*) USBDESC_HidDescriptor; // FIXME
 
   // standard blink1 startup white fadeout
-  for( uint8_t i=255; i>0; i-- ) {
-    SpinDelay(1);
-    uint8_t j = i>>4;      // not so bright, please
-    setLED(j,j,j, 0); // LED A
-    setLED(j,j,j, 1); // LED B
-    displayLEDs();
+  for( uint8_t k=3; k>0; k-- ) {
+    for( uint8_t i=255; i>0; i-- ) {
+      SpinDelay(1);
+      uint8_t j = i>>2;      // not so bright, please
+      setLED(j,j,j, 255); // all LEDs
+      displayLEDs();
+    }
   }
 
   // Enable the USB controller.
