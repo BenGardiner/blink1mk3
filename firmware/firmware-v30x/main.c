@@ -279,7 +279,7 @@ uint8_t playpos   = 0; // current play position
 //
 uint8_t playstart = 0; // start play position
 uint8_t playend   = PATT_MAX; // end play position
-uint8_t playcount = 0; // number of times to play loop, or 0=infinite
+uint8_t playcount = 1; // number of times to play loop, or 0=infinite
 //#define playstart userData.startup_params.playstart
 //#define playend   userData.startup_params.playend
 //#define playcount userData.startup_params.playcount
@@ -561,7 +561,7 @@ static void updateLEDs(void)
             playing = PLAY_ON;
             playstart = serverdown_playstart;
             playend   = serverdown_playend;
-            playcount = 0; // play infinitely
+            playcount = 1; // play infinitely
             startPlaying();
           }
         } // serverdown logic
